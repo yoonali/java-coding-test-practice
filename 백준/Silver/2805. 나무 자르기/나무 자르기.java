@@ -1,47 +1,91 @@
+import java.util.*;
 import java.io.*;
-import java.util.StringTokenizer;
 
-public class Main {
-    public static void main(String[] args) throws IOException {
-        // 빠른 입력
+public class Main{
+    public static void main(String[] args) throws Exception {
+        
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        // String line = br.readLine();   // "4 7"
+        // StringTokenizer st = new StringTokenizer(line);
+        
+        // int N = Integer.parseInt(st.nextToken());
+        // int M = Integer.parseInt(st.nextToken());
+
+        // int[] arr = new int[N];
+        // int sum = 0;
+        // int result = 0;
+
+        // String line2 = br.readLine();   // "20 15 10 17"
+        // StringTokenizer st2 = new StringTokenizer(line2);
+
+        // for (int i = 0; i < N; i++) {
+        //     int value = Integer.parseInt(st2.nextToken());
+        //     arr[i] = value;
+        //     sum += value;
+        // }
+
+        // int mid = sum / N;
+
+        // while(true) {
+        //     if(result >= M) {
+        //         for(int i = 0; i <= arr.length; i++) {
+        //             if(arr[i] - mid >= 0) {
+        //                 int value = arr[i] - mid;
+        //                 result += value;
+        //             }
+        //         }
+        //         break;
+        //     } else {
+        //         mid--;
+        //     }
+            
+        // }
+        
+        // System.out.println(mid);
+
+
+        // 1) N, M 입력
         StringTokenizer st = new StringTokenizer(br.readLine());
+        int N = Integer.parseInt(st.nextToken());
+        int M = Integer.parseInt(st.nextToken());
 
-        int n = Integer.parseInt(st.nextToken());  // 나무 수
-        int m = Integer.parseInt(st.nextToken());  // 필요한 나무 길이
-
-        int[] arr = new int[n];
-        int max = 0;
-
+        // 2) 나무 높이 입력 + 최대값 찾기
+        int[] arr = new int[N];
         st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < n; i++) {
-            arr[i] = Integer.parseInt(st.nextToken());
-            if (arr[i] > max) max = arr[i];
+
+        int max = 0;
+        for (int i = 0; i < N; i++) {
+            int value = Integer.parseInt(st.nextToken());
+            arr[i] = value;
+            if (value > max) max = value;
         }
 
-        int low = 0;
-        int high = max;
-        int result = 0;
+        // 3) 이분탐색: H(절단 높이)의 최댓값 찾기
+        int left = 0;
+        int right = max;
 
-        while (low <= high) {
-            int mid = (low + high) / 2;
-            long total = 0;
+        while (left <= right) {
+            int mid = left + (right - left) / 2; // overflow 방지
+            long result = 0;
 
-            for (int height : arr) {
-                if (height > mid) {
-                    total += (height - mid);
-                    if (total >= m) break;  // 조기 종료로 미세 최적화
-                }
+            // mid 높이로 잘랐을 때 얻는 나무 길이 합
+            for (int i = 0; i < N; i++) {
+                if (arr[i] > mid) result += (arr[i] - mid);
             }
 
-            if (total >= m) {
-                result = mid;
-                low = mid + 1;
+            // 4) M과 비교해서 범위 조정
+            if (result >= M) {
+                // 충분히 얻음 → 더 높게 잘라도 되는지(=mid 더 키우기)
+                left = mid + 1;
             } else {
-                high = mid - 1;
+                // 부족함 → 더 낮게 잘라야 함(=mid 더 낮추기)
+                right = mid - 1;
             }
         }
 
-        System.out.println(result);
+        // 반복 종료 후 right가 "가능했던 절단 높이의 최댓값"
+        System.out.println(right);
     }
+        
 }
